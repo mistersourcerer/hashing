@@ -70,7 +70,7 @@ file.to_h
 
 ### ::from_hash
 
-And I can now tell `Hasher` how one can create an instance of `File` given a
+And I can tell `Hasher` how one can create an instance of `File` given a
 valid `Hash` like the one created by a `#to_h` call:
 
 ```ruby
