@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Hashing::VERSION
   spec.authors       = ["Ricardo Valeriano"]
   spec.email         = ["ricardo.valeriano@gmail.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{Serialize your objects as Hashes}
+  #spec.description   = %q{TODO: Write a longer description. Optional.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
