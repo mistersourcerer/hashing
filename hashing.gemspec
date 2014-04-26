@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'hashing/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "Hashing"
+  spec.name          = "hashing"
   spec.version       = Hashing::VERSION
   spec.authors       = ["Ricardo Valeriano"]
   spec.email         = ["ricardo.valeriano@gmail.com"]
