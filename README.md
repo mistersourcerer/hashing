@@ -78,7 +78,7 @@ class File
   include Hashing
   hasherize :path, :commit, :content
 
-  from_hash ->(hash) {
+  loading ->(hash) {
     new hash[:path], hash[:commit], hash[:content]
   }
 
@@ -105,7 +105,7 @@ The previous example can be writen like this:
 class File
   include Hasherize.new :path, :commit, :content
 
-  from_hash ->(hash) {
+  loading ->(hash) {
     new hash[:path], hash[:commit], hash[:content]
   }
 
@@ -138,7 +138,7 @@ class File
     to_hash: ->(content) { Base64.encode64 content },
     from_hash: ->(content_string) { Base64.decode64 content_string }
 
-  from_hash ->(hash) {
+  loading ->(hash) {
     new hash[:path], hash[:commit], hash[:content]
   }
 
