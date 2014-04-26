@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["ricardo.valeriano@gmail.com"]
   spec.summary       = %q{Serialize your objects as Hashes}
   #spec.description   = %q{TODO: Write a longer description. Optional.}
-  spec.homepage      = ""
+  spec.homepage      = "http://github.com/ricardovaleriano/hashing"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
