@@ -4,6 +4,10 @@ Gives you an easy way to specify which instances vars of your objects should be
 used as `key => value` to serialize it into a hash returned by the `#to_h`
 method. Also gives you a `YourClass::from_hash` to reconstruct the instances.
 
+## Status
+[![Gem Version](https://badge.fury.io/rb/hashing.svg)](http://badge.fury.io/rb/hashing)
+[![Code Climate](https://codeclimate.com/github/ricardovaleriano/hashing.png)](https://codeclimate.com/github/ricardovaleriano/hashing)
+
 ## Installation
 
 Add this line to your application's Gemfile:
