@@ -90,6 +90,11 @@ So I can transform instances of any Ruby class into hashes and rebuild objects
 of any type from hashes, accordingly with my business rules, without expose
 these rules outside my classes.
 
+Note that both `#to_h` and `::from_hash` methods are public, and you can and
+should call them whatever you need in your programs. But the `::from_hash`
+method will be called by `Hasher` when building your instances from hashes (more
+about this: [nested hasherizing](#nested-hasherized-objects)).
+
 #### Hasherify
 
 `Hasher` comes with an alternative way to indicate what fields should be used to
@@ -142,7 +147,7 @@ end
 ```
 
 
-#### Nested Hasherized objects
+#### Nested hasherized objects
 
 But if your transformations are a little more complicated than a simple `Base64`
 encoding, chances are there that you have a nested objects to be serialized.
