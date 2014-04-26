@@ -1,5 +1,13 @@
 require "hashing/version"
 
 module Hashing
-  # Your code goes here...
+  def self.included(client_class)
+    client_class.extend Hasherizer
+  end
+
+  module Hasherizer
+    def hasherize(*ivars)
+
+    end
+  end
 end
