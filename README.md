@@ -1,8 +1,8 @@
 # Hashing
 
-Permits you to say which instance variables of your objects should be used to
-serialize it into a `Hash`. Gives you a nice way to inform this, and facilitates
-to recreation of your serializable objects from hashes.
+Gives you an easy way to specify which instances vars of your objects should be
+used as `key => value` to serialize it into a hash returned by the `#to_h`
+method. Also gives you a `YourClass::from_hash` to reconstruct the instances.
 
 ## Installation
 
