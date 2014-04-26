@@ -6,6 +6,7 @@ method. Also gives you a `YourClass::from_hash` to reconstruct the instances.
 
 ## Status
 [![Gem Version](https://badge.fury.io/rb/hashing.svg)](http://badge.fury.io/rb/hashing)
+[![Build Status](https://travis-ci.org/ricardovaleriano/hashing.png?branch=master)](http://travis-ci.org/ricardovaleriano/hashing?branch=master)
 [![Code Climate](https://codeclimate.com/github/ricardovaleriano/hashing.png)](https://codeclimate.com/github/ricardovaleriano/hashing)
 
 ## Installation
