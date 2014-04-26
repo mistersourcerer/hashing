@@ -1,4 +1,4 @@
-# Hasher
+# Hashing
 
 Permits you to say which instance variables of your objects should be used to
 serialize it into a `Hash`. Gives you a nice way to inform this, and facilitates
@@ -8,7 +8,7 @@ to recreation of your serializable objects from hashes.
 
 Add this line to your application's Gemfile:
 
-    gem 'hasher'
+    gem 'hashing'
 
 And then execute:
 
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install hasher
+    $ gem install hashing
 
 ## Usage
 
@@ -41,13 +41,13 @@ example, turn this `Hash` into a `YAML` to save it in a file.
 }
 ```
 
-I just need to include the `Hasher` module, and then indicates which
+I just need to include the `Hashing` module, and then indicates which
 `instance vars` (`ivars`) should be used in the serialization using the class
 method `hasherize`:
 
 ```ruby
 class File
-  include Hasher
+  include Hashing
   hasherize :path, :commit, :content
 end
 ```
@@ -58,24 +58,24 @@ Then I will be able to call the `#to_h` method in any instance of `File` to
 obtain the "hasherized®" version of it:
 
 ```ruby
-file = File.new 'README.md', 'cfe9aacbc02528b', '#Hasher\n\nWow. Such code...'
+file = File.new 'README.md', 'cfe9aacbc02528b', '#Hashing\n\nWow. Such code...'
 
 file.to_h
 # {
 #   path: 'README.md',
 #   commit: 'cfe9aacbc02528b',
-#   content: '#Hasher\n\nWow. Such code...'
+#   content: '#Hashing\n\nWow. Such code...'
 # }
 ```
 
 ### ::from_hash
 
-And I can tell `Hasher` how one can create an instance of `File` given a
+And I can tell `Hashing` how one can create an instance of `File` given a
 valid `Hash` like the one created by a `#to_h` call:
 
 ```ruby
 class File
-  include Hasher
+  include Hashing
   hasherize :path, :commit, :content
 
   from_hash ->(hash) {
@@ -92,18 +92,18 @@ these rules outside my classes.
 
 Note that both `#to_h` and `::from_hash` methods are public, and you can and
 should call them whatever you need in your programs. But the `::from_hash`
-method will be called by `Hasher` when building your instances from hashes (more
+method will be called by `Hashing` when building your instances from hashes (more
 about this: [nested hasherizing](#nested-hasherized-objects)).
 
-#### Hasherify
+#### Hasherize
 
-`Hasher` comes with an alternative way to indicate what fields should be used to
-represent your objects as a `Hash`. This can be done by the `Hasherify` class.
+`Hashing` comes with an alternative way to indicate what fields should be used to
+represent your objects as a `Hash`. This can be done by the `Hasherize` class.
 The previous example can be writen like this:
 
 ```ruby
 class File
-  include Hasherify.new :path, :commit, :content
+  include Hasherize.new :path, :commit, :content
 
   from_hash ->(hash) {
     new hash[:path], hash[:commit], hash[:content]
@@ -115,7 +115,7 @@ end
 
 It's just a matter of taste. Use the one that is more appealing to you.
 
-### Custom "hasherifying" and loading strategies
+### Custom "hasherizing" and loading strategies
 
 Many times you will need apply some computation over the contents of your
 `ivars` transform them in a primitive that can be stored as a `Hash`.
@@ -123,14 +123,14 @@ Many times you will need apply some computation over the contents of your
 Following the `File` class example, maybe you want to store the `@content` as a
 `Base64` enconded string.
 
-`Hasher` allows you to specify the strategy of serialization and loading when
+`Hashing` allows you to specify the strategy of serialization and loading when
 indicating which `ivars` should be part of the final `Hash`:
 
 ```ruby
 require 'base64'
 
 class File
-  include Hasher
+  include Hashing
 
   hasherize :path, :commit
 
@@ -159,7 +159,7 @@ Extending our example, maybe our `File` class have an internal collection of
 # annotation.rb
 
 class Annotation
-  include Hasherify.new :lines, :annotation
+  include Hasherize.new :lines, :annotation
 
   def initialize(lines, annotation)
     @lines = lines
@@ -190,7 +190,7 @@ example now can be rewriten as:
 
 ```ruby
 class File
-  include Hasher
+  include Hashing
 
   hasherize :path, :commit, :annotations
 
@@ -199,7 +199,7 @@ end
 ```
 
 Since the `Annotation` class has it's own notion of `#to_h` and `::from_hash`,
-this is all that `Hasher` needs to build a `File` instances from a valid `Hash`.
+this is all that `Hashing` needs to build a `File` instances from a valid `Hash`.
 
 ## Contributing
 

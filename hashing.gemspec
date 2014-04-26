@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'hasher/version'
+require 'hashing/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "hasher"
-  spec.version       = Hasher::VERSION
+  spec.name          = "Hashing"
+  spec.version       = Hashing::VERSION
   spec.authors       = ["Ricardo Valeriano"]
   spec.email         = ["ricardo.valeriano@gmail.com"]
   spec.summary       = %q{TODO: Write a short summary. Required.}
