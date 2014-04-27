@@ -101,13 +101,11 @@ module Hashing
     # @param pairs [Hash] in a valid form defined by `.hasherize`
     # @return new object
     def from_hash(pairs)
-      hash_to_load = {}
-      pairs.each do |ivar_name, value|
-        ivar = ivars.select { |ivar| ivar.to_sym == ivar_name.to_sym }.first
-        raise UnconfiguredIvar.new ivar_name, name unless ivar
-        hash_to_load[ivar.to_sym] = ivar.from_hash value
+      hash_to_load = pairs.map do |ivar_name, value|
+        ivar = ivar_by_name ivar_name.to_sym
+        [ivar.to_sym, ivar.from_hash(value)]
       end
-      strategy.call hash_to_load
+      strategy.call Hash[hash_to_load]
     end
 
     private
@@ -131,6 +129,18 @@ module Hashing
       strategies = ivars_and_options.last if ivars_and_options.last.is_a? Hash
       strategies[strategy]
     end
+
+    # Search an `ivar` by it's name in the class ivars collection
+    #
+    # #TODO: Can be enhanced since now the ivars doesn't have a sense of
+    # equality.
+    #
+    # @param ivar_name [Symbol] `ivar` name
+    # @return [Ivar]
+    def ivar_by_name(ivar_name)
+      ivar = ivars.select { |ivar| ivar.to_sym == ivar_name }.first
+      raise UnconfiguredIvar.new ivar_name, name unless ivar
+      ivar
     end
   end
 end
