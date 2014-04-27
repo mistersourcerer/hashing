@@ -119,11 +119,18 @@ module Hashing
       end
     end
 
-    def strategy_for_key(hash_key, ivars_and_options)
-      # default transformation strategy
-      strategies = { hash_key.to_sym =>  ->(ivar_value) { ivar_value } }
+    # Fetches the strategy to serialize or deserialize (defined by the first
+    # param `strategy`) the `ivars` passed as second parameter
+    #
+    # @param hash_key [Symbol] (:to_hash || :from_hash) type of strategy to fetch
+    # @param ivars_and_options [*args | *args, Hash]
+    # @return [#call] strategy to be used
+    def strategy_for_key(strategy, ivars_and_options)
+      default_strategy_just_returns = ->(ivar_value) { ivar_value }
+      strategies = { strategy => default_strategy_just_returns }
       strategies = ivars_and_options.last if ivars_and_options.last.is_a? Hash
-      strategies[hash_key.to_sym]
+      strategies[strategy]
+    end
     end
   end
 end
