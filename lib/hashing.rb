@@ -1,5 +1,6 @@
-require "hashing/version"
-require "hashing/ivar"
+require 'hashing/version'
+require 'hashing/ivar'
+require 'hasherize'
 
 module Hashing
   # Inform the user about an attempt to create an instance, using a `Hash` with
@@ -121,11 +122,11 @@ module Hashing
     # @param ivars_and_options [Array] arguments received by `.serialize`
     # @return [Array[:Symbol]] ivar names that should be used in the `Hash` serialization
     def extract_ivars(ivars_and_options)
-      if ivars_and_options.last.is_a? Hash
-        [ivars_and_options.first]
-      else
-        ivars_and_options
+      ivars = ivars_and_options.dup
+      if ivars.last.is_a? Hash
+        ivars.pop
       end
+      ivars
     end
 
     # Fetches the strategy to serialize or deserialize (defined by the first
