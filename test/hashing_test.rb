@@ -1,3 +1,5 @@
+require "base64"
+
 describe Hashing do
   describe 'interface' do
     let(:hasherized) do
@@ -27,6 +29,7 @@ describe Hashing do
         attr_reader :h
 
         include Hashing
+        hasherize :h
 
         def initialize(h)
           @h = h
@@ -43,8 +46,55 @@ describe Hashing do
     end
 
     it 'just calls .new if none strategy was defined by .loading' do
-      new_object = hasherized.from_hash test: 'hasherizing'
-      new_object.h.must_be :==, { test: 'hasherizing' }
+      new_object = hasherized.from_hash h: 'hasherizing'
+      new_object.h.must_be :==, { h: 'hasherizing' }
+    end
+
+    it 'give an informative message in case the Hash is malformed' do
+      OmgLolBBQ = hasherized
+      message = nil
+      proc {
+        begin
+          OmgLolBBQ.from_hash xpto: 'JUST NO!'
+        rescue => e
+          message = e.message
+          raise e
+        end
+      }.must_raise Hashing::UnconfiguredIvar
+      message.must_be :==, 'The Hash has a :xpto key, but no @xpto '+
+        'was configured in OmgLolBBQ'
+    end
+  end
+
+  describe '.hasherize' do
+    let(:hasherized) do
+      Class.new do
+        include Hashing
+
+        attr_reader :content
+
+        hasherize :file, :commit
+        hasherize :content,
+          to_hash: ->(content) { Base64.encode64(content) },
+          from_hash: ->(hash_string) { Base64.decode64(hash_string) }
+        loading ->(hash) { new hash[:file], hash[:commit], hash[:content] }
+
+        def initialize(file, commit, content)
+          @file, @commit, @content = file, commit, content
+        end
+      end
+    end
+
+    it 'allows configure how to serialize a specific `ivar`' do
+      file = hasherized.new 'README.md', 'cfe9aacbc02528b', '#Hashing\n\nWow. Such code...'
+      file.to_h[:content].must_be :==, Base64.encode64('#Hashing\n\nWow. Such code...')
+    end
+
+    it 'allows configure how to load a value for a specific `ivar`' do
+      file = hasherized.from_hash file: 'README.md',
+        commit: 'cfe9aacbc02528b',
+        content: Base64.encode64('#Hashing\n\nWow. Such code...')
+      file.content.must_be :==, '#Hashing\n\nWow. Such code...'
     end
   end
 
