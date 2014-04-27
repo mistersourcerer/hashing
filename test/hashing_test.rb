@@ -37,32 +37,36 @@ describe Hashing do
       end
     end
 
-    it 'uses (`#call`) the strategy defined by `.loading`' do
-      called = false
-      my_strategy = ->(h) { called = true }
-      hasherized.send :loading, my_strategy
-      hasherized.from_hash Hash.new
-      called.must_be :==, true
+    describe '.loading' do
+      it 'uses (`#call`) the strategy defined by `.loading`' do
+        called = false
+        my_strategy = ->(h) { called = true }
+        hasherized.send :loading, my_strategy
+        hasherized.from_hash Hash.new
+        called.must_be :==, true
+      end
     end
 
-    it 'just calls .new if none strategy was defined by .loading' do
-      new_object = hasherized.from_hash h: 'hasherizing'
-      new_object.h.must_be :==, { h: 'hasherizing' }
-    end
+    describe '#from_hash' do
+      it 'just calls .new if none strategy was defined by .loading' do
+        new_object = hasherized.from_hash h: 'hasherizing'
+        new_object.h.must_be :==, { h: 'hasherizing' }
+      end
 
-    it 'give an informative message in case the Hash is malformed' do
-      OmgLolBBQ = hasherized
-      message = nil
-      proc {
-        begin
-          OmgLolBBQ.from_hash xpto: 'JUST NO!'
-        rescue => e
-          message = e.message
-          raise e
-        end
-      }.must_raise Hashing::UnconfiguredIvar
-      message.must_be :==, 'The Hash has a :xpto key, but no @xpto '+
-        'was configured in OmgLolBBQ'
+      it 'give an informative message in case the Hash is malformed' do
+        OmgLolBBQ = hasherized
+        message = nil
+        proc {
+          begin
+            OmgLolBBQ.from_hash xpto: 'JUST NO!'
+          rescue => e
+            message = e.message
+            raise e
+          end
+        }.must_raise Hashing::UnconfiguredIvar
+        message.must_be :==, 'The Hash has a :xpto key, but no @xpto '+
+          'was configured in OmgLolBBQ'
+      end
     end
   end
 
