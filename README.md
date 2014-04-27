@@ -152,6 +152,19 @@ class File
 end
 ```
 
+#### Custom hasherizing and loading strategies for multiple ivars
+
+You can indicate the same strategies for hasherzing and load from hashes for
+multiple `ivars` if it makes sense to your program:
+
+class File
+  include Hashing
+
+  hasherize :path, :commit,
+    to_hash: ->(value) { value.downcase },
+    from_hash: ->(value) { value.downcase }
+end
+
 
 #### Nested hasherized objects
 
