@@ -21,11 +21,24 @@ module Hashing
     # constructor. If some was made, return the value after being processed or
     # else return the value as it is.
     #
+    # Also guarantee that if a value is a #map, every item with `Hashing` in his
+    # method lookup will be sent the message `#to_h`.
+    #
     # @param value [Object] object to be processed before being stored in a `Hash`
     # @return the value that will be stored in the `Hash`
     def to_h(value)
       return value unless @to_h
-      @to_h.call value
+      if value.respond_to? :map
+        value.map { |item|
+          if item.class.ancestors.include? Hashing
+            item.to_h
+          else
+            item
+          end
+        }
+      else
+        @to_h.call value
+      end
     end
 
     # Processes the Object provinient from a `Hash` so it can be used to

@@ -36,6 +36,13 @@ module Hashing
   def self.included(client_class)
     client_class.extend Hasherizer
   end
+
+  def meta_data(name, value)
+    @_hashing_meta_data ||= { __hashing__: { types: {} } }
+    @_hashing_meta_data[:__hashing__][:types][name] = value
+    @_hashing_meta_data
+  end
+
   #
   # The `Hash` returned by `#to_h` will be formed by keys based on the ivars
   # names passed to `hasherize` method.
@@ -47,9 +54,13 @@ module Hashing
   #   # => { path: 'README.md', commit: 'cfe9aacbc02528b' }
   def to_h
     hash_pairs = self.class.ivars.map { |ivar|
-      [ivar.to_sym, ivar.to_h(instance_variable_get "@#{ivar}")]
+      value = instance_variable_get "@#{ivar}"
+      if value.respond_to? :map
+        meta_data ivar.to_sym, value.first.class
+      end
+      [ivar.to_sym, ivar.to_h(value)]
     }
-    Hash[hash_pairs]
+    Hash[hash_pairs].merge(@_hashing_meta_data || {})
   end
 
   # Define the class methods that should be available in a 'hasherized ®' class
@@ -107,8 +118,15 @@ module Hashing
     # @param pairs [Hash] in a valid form defined by `.hasherize`
     # @return new object
     def from_hash(pairs)
+      metadata = pairs.delete(:__hashing__) || {}
       hash_to_load = pairs.map do |ivar_name, value|
         ivar = ivar_by_name ivar_name.to_sym
+        if value.respond_to? :map
+          elements_class = metadata.fetch(:types, {}).fetch(ivar_name, nil)
+          if elements_class.respond_to? :from_hash
+            value = value.map { |element| elements_class.from_hash element }
+          end
+        end
         [ivar.to_sym, ivar.from_hash(value)]
       end
       strategy.call Hash[hash_to_load]
