@@ -223,7 +223,7 @@ this is all that `Hashing` needs to build a `File` instances from a valid `Hash`
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/hasher/fork )
+1. Fork it ( https://github.com/ricardovaleriano/hashing/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
