@@ -157,6 +157,7 @@ end
 You can indicate the same strategies for hasherzing and load from hashes for
 multiple `ivars` if it makes sense to your program:
 
+```ruby
 class File
   include Hashing
 
@@ -164,7 +165,7 @@ class File
     to_hash: ->(value) { value.downcase },
     from_hash: ->(value) { value.downcase }
 end
-
+```
 
 #### Nested hasherized objects
 
