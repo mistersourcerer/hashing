@@ -1,3 +1,3 @@
-module Hashing
-  VERSION = "0.0.1.beta.2"
+module Hasher
+  VERSION = "0.0.1"
 end
