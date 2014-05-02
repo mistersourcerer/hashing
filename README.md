@@ -229,7 +229,7 @@ this is all that `Hashing` needs to build a `File` instances from a valid `Hash`
 
 ## Contributing
 
-This was a rapid "scratch your own itch" kind of project. It will make me real
+This is a rapid "scratch your own itch" kind of project. It will make me really
 happy if it can be used used in your software anyhow. If you need something
 different than what is in it, or can solve us some bugs or add documentation, it
 will be very well received!
