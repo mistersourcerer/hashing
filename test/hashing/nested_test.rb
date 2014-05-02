@@ -43,10 +43,27 @@ describe Hashing do
             }
           }
         }
-        p owner.to_h
       end
 
-      it "don't call the #to_h on inner object that don't include `Hashing`"
+      it "don't call the #to_h on inner object that don't include `Hashing`" do
+        owner = HashingCollectionOwner.new 'README.md', 'cfe9aacbc02528b', [
+          HashingCollectionMember.new('first'),
+          "xpto",
+        ]
+        owner.to_h.must_be :==, {
+          file: 'README.md',
+          commit: 'cfe9aacbc02528b',
+          annotations: [
+            { annotation: '--first' },
+            'xpto',
+          ],
+          __hashing__: {
+            types: {
+              annotations: HashingCollectionMember
+            }
+          }
+        }
+      end
     end
 
     describe '#from_h' do
