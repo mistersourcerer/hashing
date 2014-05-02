@@ -121,13 +121,7 @@ module Hashing
       metadata = pairs.delete(:__hashing__) || {}
       hash_to_load = pairs.map do |ivar_name, value|
         ivar = ivar_by_name ivar_name.to_sym
-        if value.respond_to? :map
-          elements_class = metadata.fetch(:types, {}).fetch(ivar_name, nil)
-          if elements_class.respond_to? :from_hash
-            value = value.map { |element| elements_class.from_hash element }
-          end
-        end
-        [ivar.to_sym, ivar.from_hash(value)]
+        [ivar.to_sym, ivar.from_hash(value, metadata)]
       end
       strategy.call Hash[hash_to_load]
     end
