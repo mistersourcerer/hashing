@@ -111,7 +111,7 @@ about this: [nested hasherizing](#nested-hasherized-objects)).
 
 `Hashing` comes with an alternative way to indicate what fields should be used to
 represent your objects as a `Hash`. This can be done by the `Hasherize` class.
-The previous example can be writen like this:
+The previous example can be written like this:
 
 ```ruby
 class File
@@ -147,12 +147,61 @@ class File
   hasherize :path, :commit
 
   hasherize :content,
-    to_hash: ->(content) { Base64.encode64 content },
-    from_hash: ->(content_string) { Base64.decode64 content_string }
+    to: ->(content) { Base64.encode64 content },
+    from: ->(content_string) { Base64.decode64 content_string }
 
-  loading ->(hash) {
-    new hash[:path], hash[:commit], hash[:content]
-  }
+  loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
+
+  # ...
+end
+```
+
+But I will recomend this approach only if your strategy for serialization is
+more complex than just call a method in an object passing the raw value. If your
+need is exactly like this, you can just indicate the object and the methods that
+should be called in what moment:
+
+```ruby
+require 'base64'
+
+class File
+  include Hashing
+
+  hasherize :path, :commit
+  hasherize :content, using: Base64, to: :encode64, from: :decode64
+
+  loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
+
+  # ...
+end
+```
+
+And finally, if the your serialization logic is worth a method on it's own, you
+can indicate this by passing the method names via symbol to the `:to` and
+`:from` options. Since those methods don't necessarily make sense as part of
+your public api, so you can even make then private:
+
+```ruby
+require 'base64'
+
+class File
+  include Hashing
+
+  hasherize :path, :commit
+  hasherize :content, to: :encode, from: :decode
+
+  loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
+
+  # ...
+
+  private
+  def encode(content)
+    Base64.encode64 content
+  end
+
+  def decode(content)
+    Base64.decode64 content
+  end
 
   # ...
 end
@@ -168,10 +217,14 @@ class File
   include Hashing
 
   hasherize :path, :commit,
-    to_hash: ->(value) { value.downcase },
-    from_hash: ->(value) { value.downcase }
+    to: ->(value) { value.downcase },
+    from: ->(value) { value.upcase }
 end
 ```
+
+This will guarantees that the final `Hash` has the `commit` value "downcased"
+when your object is serialized, and "upcased" when the instance is
+reconstructed.
 
 #### Nested hasherized objects
 
@@ -212,13 +265,14 @@ end
 
 So in this case, if you wants a file to be `hasherized®` with it's internall
 `@annotations` preserved, you just indicate this in the `File` class. The
-example now can be rewriten as:
+example now can be rewritten as:
 
 ```ruby
 class File
   include Hashing
 
-  hasherize :path, :commit, :annotations
+  hasherize :path, :commit
+  hasherize :annotations, collection: Annotation
 
   # ...
 end
@@ -226,6 +280,39 @@ end
 
 Since the `Annotation` class has it's own notion of `#to_h` and `::from_hash`,
 this is all that `Hashing` needs to build a `File` instances from a valid `Hash`.
+
+#### Defining `attr_reader` within the `.hasherize` invocation
+
+If you want to define `readers` for the `ivars` passed as `.hasherize`, you can
+do this passing the option `attr: true`.
+
+So, the following example:
+
+```ruby
+class File
+  include Hashing
+  hasherize :path, :commit, :content
+
+  attr_reader :path, :commit, :content
+end
+```
+
+Can be written as:
+
+```ruby
+class File
+  include Hashing
+  hasherize :path, :commit, :content, attr: true
+end
+```
+
+Or if you prefer a one liner in this case:
+
+```ruby
+class File
+  include Hasherize.new :path, :commit, :content, attr: true
+end
+```
 
 ## Contributing
 
