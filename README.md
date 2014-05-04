@@ -283,8 +283,8 @@ this is all that `Hashing` needs to build a `File` instances from a valid `Hash`
 
 #### Defining `attr_reader` within the `.hasherize` invocation
 
-If you want to define `readers` for the `ivars` passed as `.hasherize`, you can
-do this passing the option `attr: true`.
+If you want to define `readers` for the `ivars` passed to `.hasherize`, you can
+do this with the option `attr: true` (defaults to `false`).
 
 So, the following example:
 
