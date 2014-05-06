@@ -55,7 +55,7 @@ module Hashing
   #   file.to_h
   #   # => { path: 'README.md', commit: 'cfe9aacbc02528b' }
   def to_h
-    hash_pairs = self.class.ivars.map { |ivar|
+    hash_pairs = self.class._ivars.map { |ivar|
       value = instance_variable_get "@#{ivar}"
       if value.respond_to? :map
         meta_data ivar.to_sym, value.first.class

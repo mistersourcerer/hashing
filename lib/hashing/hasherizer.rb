@@ -8,14 +8,12 @@ module Hashing
     # @api
     # @param ivars_and_options [*arguments]
     def hasherize(*ivars_and_options)
-      ivars, raw_options = extract_ivars ivars_and_options
-
+      ivars, raw_options = _extract_ivars ivars_and_options
       @_options = Options.new(raw_options).filter caller.first
-      to_strategy = strategy_for_key :to_hash, ivars_and_options
-      from_strategy = strategy_for_key :from_hash, ivars_and_options
-
-      @ivars ||= []
-      @ivars += ivars.map { |ivar| Ivar.new ivar, to_strategy, from_strategy }
+      @_ivars ||= []
+      @_ivars += ivars.map { |ivar|
+        Ivar.new ivar, @_options.strategies[:to], @_options.strategies[:from]
+      }
     end
 
     # Configures the strategy to (re)create an instance of the 'hasherized ®'
@@ -28,27 +26,19 @@ module Hashing
     # @param strategy [#call]
     # @return void
     def loading(strategy)
-      @strategy = strategy
-    end
-
-    # Provides the default strategy for recreate objects from hashes (which is
-    # just call .new passing the `Hash` as is.
-    #
-    # @return the result of calling the strategy
-    def strategy
-      @strategy || ->(h) { new h }
+      @_strategy = strategy
     end
 
     # those methods are private but part of the class api (macros).
     # #TODO: there is a way to document the 'macros' for a class in YARD?
-    private :hasherize, :loading, :strategy
+    private :hasherize, :loading
 
     # provides access to the current configuration on what `ivars` should be
     # used to generate a `Hash` representation of instances of the client class.
     #
     # @return [Array] ivars that should be included in the final Hash
-    def ivars
-      @ivars ||= []
+    def _ivars
+      @_ivars ||= []
     end
 
     # Receives a `Hash` and uses the strategy configured by `.loading` to
@@ -59,47 +49,42 @@ module Hashing
     def from_hash(pairs)
       metadata = pairs.delete(:__hashing__) || {}
       hash_to_load = pairs.map do |ivar_name, value|
-        ivar = ivar_by_name ivar_name.to_sym
+        ivar = _ivar_by_name ivar_name.to_sym
         [ivar.to_sym, ivar.from_hash(value, metadata)]
       end
-      strategy.call Hash[hash_to_load]
+      _loading_strategy.call Hash[hash_to_load]
     end
 
     private
+    # Provides the default strategy for recreate objects from hashes (which is
+    # just call .new passing the `Hash` as is.
+    #
+    # @return the result of calling the strategy
+    def _loading_strategy
+      @_strategy || ->(h) { new h }
+    end
+
     # Cleanup the arguments received by `.hasherize` so only the `ivar` names
     # are returned. This is necessarey since the `.hasherize` can receive a
     # `Hash` with strategies `:from_hash` and `:to_hash` as the last argument.
     #
     # @param ivars_and_options [Array] arguments received by `.serialize`
     # @return [Array[:Symbol]] ivar names that should be used in the `Hash` serialization
-    def extract_ivars(ivars_and_options)
+    def _extract_ivars(ivars_and_options)
       ivars = ivars_and_options.dup
       options = ivars.last.is_a?(Hash) ? ivars.pop : {}
       return ivars, options
     end
 
-    # Fetches the strategy to serialize or deserialize (defined by the first
-    # param `strategy`) the `ivars` passed as second parameter
-    #
-    # @param strategy [Symbol] (:to_hash || :from_hash) type of strategy to fetch
-    # @param ivars_and_options [*args | *args, Hash]
-    # @return [#call] strategy to be used
-    def strategy_for_key(strategy, ivars_and_options)
-      default_strategy_just_returns = ->(ivar_value) { ivar_value }
-      strategies = { strategy => default_strategy_just_returns }
-      strategies = ivars_and_options.last if ivars_and_options.last.is_a? Hash
-      strategies[strategy]
-    end
-
     # Search an `ivar` by it's name in the class ivars collection
     #
     # #TODO: Can be enhanced since now the ivars doesn't have a sense of
-    # equality.
+    # equality (and they should have)
     #
     # @param ivar_name [Symbol] `ivar` name
     # @return [Ivar]
-    def ivar_by_name(ivar_name)
-      ivar = ivars.select { |ivar| ivar.to_sym == ivar_name }.first
+    def _ivar_by_name(ivar_name)
+      ivar = _ivars.select { |ivar| ivar.to_sym == ivar_name }.first
       raise UnconfiguredIvar.new ivar_name, name unless ivar
       ivar
     end
