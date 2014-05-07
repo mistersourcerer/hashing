@@ -10,10 +10,13 @@ module Hashing
     def hasherize(*ivars_and_options)
       ivars, raw_options = _extract_ivars ivars_and_options
       @_options = Options.new(raw_options).filter caller.first
+      strategies = @_options.strategies
       @_ivars ||= []
-      @_ivars += ivars.map { |ivar|
-        Ivar.new ivar, @_options.strategies[:to], @_options.strategies[:from]
-      }
+      @_ivars += instantiate_ivars ivars, strategies[:to], strategies[:from]
+    end
+
+    def instantiate_ivars(ivars, to, from)
+      ivars.map { |name| Ivar.new name, to, from }
     end
 
     # Configures the strategy to (re)create an instance of the 'hasherized ®'
@@ -61,7 +64,7 @@ module Hashing
     #
     # @return the result of calling the strategy
     def _loading_strategy
-      @_strategy || ->(h) { new h }
+      @_strategy || ->(hash) { new hash }
     end
 
     # Cleanup the arguments received by `.hasherize` so only the `ivar` names
