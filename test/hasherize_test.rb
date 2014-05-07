@@ -4,8 +4,8 @@ describe Hasherize do
       attr_reader :file, :commit
 
       include Hasherize.new :file, :commit,
-        to_hash: ->(value) { "X-#{value}" },
-        from_hash: ->(value) { "#{value}-X" }
+        to: ->(value) { "X-#{value}" },
+        from: ->(value) { "#{value}-X" }
 
       loading ->(params) { new params[:file], params[:commit] }
 
