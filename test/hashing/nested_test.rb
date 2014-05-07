@@ -24,6 +24,10 @@ describe Hashing do
       end
     end
 
+    it "since v0.1.0 we should be using the :collection option" do
+      false.must_be :==, true
+    end
+
     describe '#to_h' do
       it 'calls #to_h for each array item when hashifying the object' do
         owner = HashingCollectionOwner.new 'README.md', 'cfe9aacbc02528b', [
