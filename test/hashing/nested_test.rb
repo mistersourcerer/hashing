@@ -87,7 +87,7 @@ describe Hashing do
         }
       end
 
-      it 'calls #from_h for each on an yaml array that contains hasherized objects' do
+      it 'calls #from_hash for each element on an yaml array that contains hasherized objects' do
         owner = HashingCollectionOwner.from_hash hash_values
         owner.annotations.first.annotation.must_be :==, 'first--'
         owner.annotations.last.annotation.must_be :==, 'second--'
