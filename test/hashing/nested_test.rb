@@ -14,8 +14,8 @@ describe Hashing do
     class HashingCollectionMember
       attr_reader :annotation
       include Hasherize.new :annotation,
-        to_hash: ->(value) { "--#{value}" },
-        from_hash: ->(value) { "#{value}--" }
+        to: ->(value) { "--#{value}" },
+        from: ->(value) { "#{value}--" }
 
       loading ->(hash) { new hash[:annotation] }
 
