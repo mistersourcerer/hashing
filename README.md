@@ -146,11 +146,10 @@ class File
 
   hasherize :path, :commit
 
-  hasherize :content,
-    to: ->(content) { Base64.encode64 content },
-    from: ->(content_string) { Base64.decode64 content_string }
-
-  loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
+  hasherize(:content).
+    to(->(content) { Base64.encode64 content }).
+    from(->(content_string) { Base64.decode64 content_string }).
+    loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
 
   # ...
 end
@@ -167,10 +166,10 @@ require 'base64'
 class File
   include Hashing
 
-  hasherize :path, :commit
-  hasherize :content, using: Base64, to: :encode64, from: :decode64
+  hasherize(:path, :commit).
+    loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
 
-  loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
+  hasherize(:content).using(Base64).to(:encode64).from(:decode64)
 
   # ...
 end
@@ -187,10 +186,10 @@ require 'base64'
 class File
   include Hashing
 
-  hasherize :path, :commit
-  hasherize :content, to: :encode, from: :decode
+  hasherize(:path, :commit).
+    loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
 
-  loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
+  hasherize(:content).to(:encode).from(:decode)
 
   # ...
 
@@ -216,9 +215,9 @@ multiple `ivars` if it makes sense to your program:
 class File
   include Hashing
 
-  hasherize :path, :commit,
-    to: ->(value) { value.downcase },
-    from: ->(value) { value.upcase }
+  hasherize(:path, :commit).
+    to(->(value) { value.downcase }).
+    from(->(value) { value.upcase })
 end
 ```
 
@@ -272,7 +271,7 @@ class File
   include Hashing
 
   hasherize :path, :commit
-  hasherize :annotations, collection: Annotation
+  hasherize(:annotations).collection(Annotation)
 
   # ...
 end
@@ -302,7 +301,7 @@ Can be written as:
 ```ruby
 class File
   include Hashing
-  hasherize :path, :commit, :content, attr: true
+  hasherize(:path, :commit, :content).attr(true)
 end
 ```
 
@@ -310,7 +309,7 @@ Or if you prefer a one liner in this case:
 
 ```ruby
 class File
-  include Hasherize.new :path, :commit, :content, attr: true
+  include Hasherize.new(:path, :commit, :content).attr(true)
 end
 ```
 
