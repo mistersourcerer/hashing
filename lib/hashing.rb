@@ -1,6 +1,5 @@
 require 'hashing/version'
 require 'hashing/ivar'
-require 'hashing/options'
 require 'hashing/hasherizer'
 require 'hasherize'
 

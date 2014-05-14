@@ -1,3 +1,5 @@
+require "optioning"
+
 module Hashing
   # Define the class methods that should be available in a 'hasherized ®' class
   # (a class that include `Hashing`).
@@ -8,11 +10,17 @@ module Hashing
     # @api
     # @param ivars_and_options [*arguments]
     def hasherize(*ivars_and_options)
-      ivars, raw_options = _extract_ivars ivars_and_options
-      @_options = Options.new(raw_options).filter caller.first
-      strategies = @_options.strategies
+      @_options = Optioning.new ivars_and_options
+      ivars = @_options.values
+
+      @_options.deprecate :to_hash, :to, "v1.0.0"
+      @_options.deprecate :from_hash, :from, "v1.0.0"
+      @_options.process caller
+
+      @_options.on :to
+
       @_ivars ||= []
-      @_ivars += instantiate_ivars ivars, strategies[:to], strategies[:from]
+      @_ivars += instantiate_ivars ivars, @_options.on(:to), @_options.on(:from)
     end
 
     def instantiate_ivars(ivars, to, from)
