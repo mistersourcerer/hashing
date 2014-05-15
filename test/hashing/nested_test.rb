@@ -2,9 +2,9 @@ describe Hashing do
   describe 'when one of the ivars is an `Array` of hasherized objects' do
     class HashingCollectionOwner
       attr_reader :file, :commit, :annotations
-      include Hasherize.new :file, :commit, :annotations
-
-      loading ->(hash) { new hash[:file], hash[:commit], hash[:annotations] }
+      include Hasherize.new(:file, :commit).
+        collection(:annotations).
+        loading ->(hash) { new hash[:file], hash[:commit], hash[:annotations] }
 
       def initialize(file, commit, annotations)
         @file, @commit, @annotations = file, commit, annotations
@@ -13,19 +13,14 @@ describe Hashing do
 
     class HashingCollectionMember
       attr_reader :annotation
-      include Hasherize.new :annotation,
-        to: ->(value) { "--#{value}" },
-        from: ->(value) { "#{value}--" }
-
-      loading ->(hash) { new hash[:annotation] }
+      include Hasherize.new(:annotation).
+        to(->(value) { "--#{value}" }).
+        from(->(value) { "#{value}--" }).
+        loading(->(hash) { new hash[:annotation] })
 
       def initialize(annotation)
         @annotation = annotation
       end
-    end
-
-    it "since v0.1.0 we should be using the :collection option" do
-      false.must_be :==, true
     end
 
     describe '#to_h' do

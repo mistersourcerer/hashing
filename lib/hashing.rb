@@ -7,9 +7,12 @@ module Hashing
   # Inform the user about an attempt to create an instance, using a `Hash` with
   # keys that does not correspond to the mape made using `.hasherize`
   class UnconfiguredIvar < StandardError
-    def initialize(ivar_name, class_name)
-      super "The Hash has a :#{ivar_name} key, "+
-        "but no @#{ivar_name} was configured in #{class_name}"
+    def initialize(ivar_names, class_name)
+      super [
+        "The hash passed to #{class_name}.from_hash has the following ",
+        "keys that aren't configured by the .hasherize method: ",
+        "#{ivar_names.join ","}."
+      ].join
     end
   end
 

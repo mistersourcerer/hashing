@@ -3,11 +3,10 @@ describe Hasherize do
     Class.new do
       attr_reader :file, :commit
 
-      include Hasherize.new :file, :commit,
-        to: ->(value) { "X-#{value}" },
-        from: ->(value) { "#{value}-X" }
-
-      loading ->(params) { new params[:file], params[:commit] }
+      include Hasherize.new(:file, :commit).
+        to(->(value) { "X-#{value}" }).
+        from(->(value) { "#{value}-X" }).
+        loading(->(params) { new params[:file], params[:commit] })
 
       def initialize(file, commit)
         @file, @commit = file, commit
@@ -25,7 +24,7 @@ describe Hasherize do
     object.commit.must_be :==, 'omglolbbq123-X'
   end
 
-  it "configure `:to_hash` e `:from_hash` serialization strategies" do
+  it "configure `:to` e `:from` serialization strategies" do
     object = hasherized.new 'README.md', 'omglolbbq123'
     object.to_h.must_be :==, { file: 'X-README.md', commit: 'X-omglolbbq123' }
   end
