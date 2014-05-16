@@ -31,8 +31,18 @@ module Hashing
       self
     end
 
-    def loader
-      @loading || ->(hash) { @host_class.new hash }
+    def load(hash)
+      sanitize_hash hash
+      loader = @loading || ->(hash) { @host_class.new hash }
+      loader.call hash
+    end
+
+    private
+    def sanitize_hash(hash)
+      unrecognized_keys = hash.keys - Array(@ivars)
+      if unrecognized_keys.count > 0
+        raise Hashing::UnconfiguredIvar.new unrecognized_keys, @host_class
+      end
     end
   end
 
@@ -57,12 +67,8 @@ module Hashing
     #
     # @param pairs [Hash] in a valid form defined by `.hasherize`
     # @return new object
-    def from_hash(pairs)
-      unrecognized_keys = pairs.keys - Array(__serialization.ivars)
-      if unrecognized_keys.count > 0
-        raise Hashing::UnconfiguredIvar.new unrecognized_keys, self
-      end
-      __serialization.loader.call pairs
+    def from_hash(hash)
+      __serialization.load hash
     end
 
     private
