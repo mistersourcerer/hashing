@@ -1,20 +1,6 @@
-require 'hashing/version'
-require 'hashing/ivar'
-require 'hashing/hasherizer'
-require 'hasherize'
+require 'hashing/macros'
 
 module Hashing
-  # Inform the user about an attempt to create an instance, using a `Hash` with
-  # keys that does not correspond to the mape made using `.hasherize`
-  class UnconfiguredIvar < StandardError
-    def initialize(ivar_names, class_name)
-      super [
-        "The hash passed to #{class_name}.from_hash has the following ",
-        "keys that aren't configured by the .hasherize method: ",
-        "#{ivar_names.join ","}."
-      ].join
-    end
-  end
 
   # Inject the public api into the client class.
   #
@@ -38,7 +24,7 @@ module Hashing
   # will be added so you can indicate what ivars do you want in your sarialized
   # objects.
   def self.included(client_class)
-    client_class.extend Hasherizer
+    client_class.extend Macros
   end
 
   #

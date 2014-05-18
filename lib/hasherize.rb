@@ -21,31 +21,12 @@ require 'hashing'
 #       from_hash: ->(content_string) { Base64.decode64 content_string }
 #   end
 class Hasherize < Module
-  class Serialization
-    def initialize(ivars)
-      @ivars = ivars
-    end
-
-    def to(block)
-      self
-    end
-
-    def from(block)
-      self
-    end
-
-    def loading(block)
-      @loading = block
-      self
-    end
-  end
 
   # Stores the ivars and options to be repassed to `Hashing.serialize` by the
   # hook {#included}
   #
   # @param ivars_and_options [*args] ivar names and options (`:to_hash` and `:from_hash`)
   def initialize(*ivars)
-    @serialization = Serialization.new ivars
   end
 
   # Includes the `Hashing` module and calls {Hashing.hasherize}, repassing the
@@ -55,20 +36,5 @@ class Hasherize < Module
       include Hashing
     end
     serializable_class.send :hasherize, *@ivars
-  end
-
-  def to(to_hash_logic)
-    @serialization.to to_hash_logic
-    self
-  end
-
-  def from(from_hash_logic)
-    @serialization.from from_hash_logic
-    self
-  end
-
-  def loading(initialization_logic)
-    @serialization.loading initialization_logic
-    self
   end
 end

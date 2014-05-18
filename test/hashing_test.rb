@@ -69,7 +69,7 @@ describe Hashing do
             message = e.message
             raise e
           end
-        }.must_raise Hashing::UnconfiguredIvar
+        }.must_raise Hashing::UnconfiguredIvarError
 
         message.must_be :==, 'The hash passed to OmgLolBBQ.from_hash has the '+
           'following keys that aren\'t configured by the .hasherize method: '+
