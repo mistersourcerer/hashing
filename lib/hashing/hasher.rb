@@ -20,6 +20,10 @@ module Hashing
       self
     end
 
+    def collection(collection_ivar_name)
+      self
+    end
+
     def add(ivar_names)
       ivar_names = Array(ivar_names)
       @current_ivars = ivar_names.map { |ivar| Ivar.new ivar }

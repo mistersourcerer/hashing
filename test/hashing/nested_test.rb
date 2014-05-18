@@ -2,7 +2,8 @@ describe Hashing do
   describe 'when one of the ivars is an `Array` of hasherized objects' do
     class HashingCollectionOwner
       attr_reader :file, :commit, :annotations
-      include Hasherize.new(:file, :commit).
+      include Hashing
+      hasherize(:file, :commit).
         collection(:annotations).
         loading ->(hash) { new hash[:file], hash[:commit], hash[:annotations] }
 
@@ -13,7 +14,8 @@ describe Hashing do
 
     class HashingCollectionMember
       attr_reader :annotation
-      include Hasherize.new(:annotation).
+      include Hashing
+      hasherize(:annotation).
         to(->(value) { "--#{value}" }).
         from(->(value) { "#{value}--" }).
         loading(->(hash) { new hash[:annotation] })
