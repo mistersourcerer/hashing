@@ -44,12 +44,12 @@ module Hashing
     def load(hash)
       check_for_unconfigured_keys hash
       loader = @loading || ->(serialized) { @host_class.new serialized }
-      loader.call transform_hash hash
+      loader.call process_hash_values hash
     end
 
     def to_h(instance)
       pairs = @ivars.map { |ivar|
-        ivar_value = instance.send :instance_variable_get, :"@#{ivar.to_sym}"
+        ivar_value = instance.instance_variable_get :"@#{ivar.to_sym}"
         [ivar.to_sym, ivar.to_h(ivar_value)]
       }
       Hash[pairs]
@@ -62,7 +62,8 @@ module Hashing
         raise Hashing::UnconfiguredIvar.new unrecognized_keys, @host_class
       end
     end
-    def transform_hash(hash)
+
+    def process_hash_values(hash)
       transformed_hash = @ivars.map { |ivar|
         [ivar.to_sym, ivar.from_hash(hash[ivar.to_sym])]
       }
