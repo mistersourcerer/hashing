@@ -78,29 +78,29 @@ describe Hashing do
     end
   end
 
-  #describe '.hasherize' do
-  #  let(:hasherized) do
-  #    Class.new do
-  #      include Hashing
+  describe '.hasherize' do
+    let(:hasherized) do
+      Class.new do
+        include Hashing
 
-  #      attr_reader :content
+        attr_reader :content
 
-  #      hasherize :file, :commit
-  #      hasherize :content,
-  #        to_hash: ->(content) { Base64.encode64(content) },
-  #        from_hash: ->(hash_string) { Base64.decode64(hash_string) }
-  #      loading ->(hash) { new hash[:file], hash[:commit], hash[:content] }
+        hasherize :file, :commit
+        hasherize(:content).
+          to(->(content) { Base64.encode64(content) }).
+          from(->(hash_string) { Base64.decode64(hash_string) }).
+          loading(->(hash) { new hash[:file], hash[:commit], hash[:content] })
 
-  #      def initialize(file, commit, content)
-  #        @file, @commit, @content = file, commit, content
-  #      end
-  #    end
-  #  end
+        def initialize(file, commit, content)
+          @file, @commit, @content = file, commit, content
+        end
+      end
+    end
 
-  #  it 'allows configure how to serialize a specific `ivar`' do
-  #    file = hasherized.new 'README.md', 'cfe9aacbc02528b', '#Hashing\n\nWow. Such code...'
-  #    file.to_h[:content].must_be :==, Base64.encode64('#Hashing\n\nWow. Such code...')
-  #  end
+    it 'allows configure how to serialize a specific `ivar`' do
+      file = hasherized.new 'README.md', 'cfe9aacbc02528b', '#Hashing\n\nWow. Such code...'
+      file.to_h[:content].must_be :==, Base64.encode64('#Hashing\n\nWow. Such code...')
+    end
 
   #  it 'allows configure how to load a value for a specific `ivar`' do
   #    file = hasherized.from_hash file: 'README.md',
@@ -108,7 +108,7 @@ describe Hashing do
   #      content: Base64.encode64('#Hashing\n\nWow. Such code...')
   #    file.content.must_be :==, '#Hashing\n\nWow. Such code...'
   #  end
-  #end
+  end
 
   #describe '#to_h' do
   #  let(:hasherized) do

@@ -1,19 +1,29 @@
 require "optioning"
 
 module Hashing
-  class Serialization
+  class Hasher
     attr_reader :ivars
 
     def initialize(host_class, ivars = nil)
       @host_class = host_class
-      @ivars = ivars
+      add ivars
     end
 
     def to(block)
+      @current_ivars.each { |ivar| ivar.to_h = block }
       self
     end
 
     def from(block)
+      @current_ivars.each { |ivar| ivar.from_hash = block }
+      self
+    end
+
+    def add(ivar_names)
+      ivar_names = Array(ivar_names)
+      @current_ivars = ivar_names.map { |ivar| Ivar.new ivar }
+      @ivars ||= []
+      @ivars += @current_ivars
       self
     end
 
@@ -32,14 +42,22 @@ module Hashing
     end
 
     def load(hash)
-      sanitize_hash hash
-      loader = @loading || ->(hash) { @host_class.new hash }
+      check_for_unconfigured_keys hash
+      loader = @loading || ->(serialized) { @host_class.new serialized }
       loader.call hash
     end
 
+    def to_h(instance)
+      pairs = @ivars.map { |ivar|
+        ivar_value = instance.send :instance_variable_get, :"@#{ivar.to_sym}"
+        [ivar.to_sym, ivar.to_h(ivar_value)]
+      }
+      Hash[pairs]
+    end
+
     private
-    def sanitize_hash(hash)
-      unrecognized_keys = hash.keys - Array(@ivars)
+    def check_for_unconfigured_keys(hash)
+      unrecognized_keys = hash.keys - @ivars.map(&:to_sym)
       if unrecognized_keys.count > 0
         raise Hashing::UnconfiguredIvar.new unrecognized_keys, @host_class
       end
@@ -55,7 +73,7 @@ module Hashing
     # @api
     # @param ivars [Array<Symbol>]
     def hasherize(*ivars)
-      @__serialization = Serialization.new self, ivars
+      __hasher.add ivars
     end
 
     # those methods are private but part of the class api (macros).
@@ -68,12 +86,11 @@ module Hashing
     # @param pairs [Hash] in a valid form defined by `.hasherize`
     # @return new object
     def from_hash(hash)
-      __serialization.load hash
+      __hasher.load hash
     end
 
-    private
-    def __serialization
-      @__serialization ||= Serialization.new self
+    def __hasher
+      @__hasher ||= Hasher.new self
     end
   end
 end

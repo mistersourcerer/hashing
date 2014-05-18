@@ -3,6 +3,7 @@ module Hashing
   # to represent an object in a `Hash` form (serialization).
   class Ivar
     attr_reader :name
+    attr_writer :to_h, :from_hash
 
     # Configure the name of an `ivar` and the 'callable' objects thath will be
     # used to prepare the `ivar` value for serialization, and to load the object

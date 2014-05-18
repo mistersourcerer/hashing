@@ -51,26 +51,6 @@ module Hashing
   #   file.to_h
   #   # => { path: 'README.md', commit: 'cfe9aacbc02528b' }
   def to_h
-    hash_pairs = self.class._ivars.map { |ivar|
-      # use the @option.on[:collection] to solve this better
-      value = instance_variable_get "@#{ivar}"
-      construct_collection_metada value, ivar
-      [ivar.to_sym, ivar.to_h(value)]
-    }
-    Hash[hash_pairs].merge(@_hashing_meta_data || {})
-  end
-
-  private
-
-  def _meta_data(name, class_name)
-    @_hashing_meta_data ||= { __hashing__: { types: {} } }
-    @_hashing_meta_data[:__hashing__][:types][name] = class_name
-    @_hashing_meta_data
-  end
-
-  def construct_collection_metada(value, ivar)
-    if value.respond_to? :map
-      _meta_data ivar.to_sym, value.first.class
-    end
+    self.class.__hasher.to_h self
   end
 end
