@@ -102,30 +102,30 @@ describe Hashing do
       file.to_h[:content].must_be :==, Base64.encode64('#Hashing\n\nWow. Such code...')
     end
 
-  #  it 'allows configure how to load a value for a specific `ivar`' do
-  #    file = hasherized.from_hash file: 'README.md',
-  #      commit: 'cfe9aacbc02528b',
-  #      content: Base64.encode64('#Hashing\n\nWow. Such code...')
-  #    file.content.must_be :==, '#Hashing\n\nWow. Such code...'
-  #  end
+    it 'allows configure how to load a value for a specific `ivar`' do
+      file = hasherized.from_hash file: 'README.md',
+        commit: 'cfe9aacbc02528b',
+        content: Base64.encode64('#Hashing\n\nWow. Such code...')
+      file.content.must_be :==, '#Hashing\n\nWow. Such code...'
+    end
   end
 
-  #describe '#to_h' do
-  #  let(:hasherized) do
-  #    Class.new do
-  #      include Hashing
-  #      hasherize :file, :commit
-  #      loading ->(hash) { new hash[:file], hash[:commit] }
+  describe '#to_h' do
+    let(:hasherized) do
+      Class.new do
+        include Hashing
+        hasherize(:file, :commit).
+          loading ->(hash) { new hash[:file], hash[:commit] }
 
-  #      def initialize(file, commit)
-  #        @file, @commit = file, commit
-  #      end
-  #    end
-  #  end
+        def initialize(file, commit)
+          @file, @commit = file, commit
+        end
+      end
+    end
 
-  #  it 'creates a hash using the ivars based on `.hasherize`' do
-  #    object = hasherized.new 'README.md', 'cfe9aacbc02528b'
-  #    object.to_h.must_be :==, { file: 'README.md', commit: 'cfe9aacbc02528b' }
-  #  end
-  #end
+    it 'creates a hash using the ivars based on `.hasherize`' do
+      object = hasherized.new 'README.md', 'cfe9aacbc02528b'
+      object.to_h.must_be :==, { file: 'README.md', commit: 'cfe9aacbc02528b' }
+    end
+  end
 end

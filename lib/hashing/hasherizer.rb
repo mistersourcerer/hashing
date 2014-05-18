@@ -35,7 +35,7 @@ module Hashing
     # be just repassing the `Hash` to the initializer.
     #
     # @param strategy [#call]
-    # @return void
+    # @return [Hasher] (fluent interface)
     def loading(block)
       @loading = block
       self
@@ -44,7 +44,7 @@ module Hashing
     def load(hash)
       check_for_unconfigured_keys hash
       loader = @loading || ->(serialized) { @host_class.new serialized }
-      loader.call hash
+      loader.call transform_hash hash
     end
 
     def to_h(instance)
@@ -61,6 +61,12 @@ module Hashing
       if unrecognized_keys.count > 0
         raise Hashing::UnconfiguredIvar.new unrecognized_keys, @host_class
       end
+    end
+    def transform_hash(hash)
+      transformed_hash = @ivars.map { |ivar|
+        [ivar.to_sym, ivar.from_hash(hash[ivar.to_sym])]
+      }
+      Hash[transformed_hash]
     end
   end
 
