@@ -65,11 +65,13 @@ module Hashing
     end
 
     def to_h(value)
-      puts "hello! to_h from collection #{value}"
+      @holder.to_h value.map { |item|
+        item.respond_to?(:to_h) ? item.to_h : item
+      }
     end
 
     def from_hash(value)
-      puts "hello! from_hash from collection #{value}"
+      @holder.from_hash value.map { |item| @type.from_hash item }
     end
   end
 end
