@@ -20,13 +20,17 @@ module Hashing
       self
     end
 
-    def collection(collection_ivar_name)
+    def collection(type)
+      # replace current ivar for it's collection...
+      collections = @current_ivars.map { |ivar| IvarCollection.new ivar, type }
+      @current_ivars.each { |ivar| @ivars.delete ivar }
+      @ivars += collections
       self
     end
 
     def add(ivar_names)
       ivar_names = Array(ivar_names)
-      @current_ivars = ivar_names.map { |ivar| Ivar.new ivar }
+      @current_ivars = ivar_names.map { |ivar_name| Ivar.new ivar_name }
       @ivars ||= []
       @ivars += @current_ivars
       self

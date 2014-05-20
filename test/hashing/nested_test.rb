@@ -1,17 +1,5 @@
 describe Hashing do
   describe 'when one of the ivars is an `Array` of hasherized objects' do
-    class HashingCollectionOwner
-      attr_reader :file, :commit, :annotations
-      include Hashing
-      hasherize(:file, :commit).
-        collection(:annotations).
-        loading ->(hash) { new hash[:file], hash[:commit], hash[:annotations] }
-
-      def initialize(file, commit, annotations)
-        @file, @commit, @annotations = file, commit, annotations
-      end
-    end
-
     class HashingCollectionMember
       attr_reader :annotation
       include Hashing
@@ -22,6 +10,19 @@ describe Hashing do
 
       def initialize(annotation)
         @annotation = annotation
+      end
+    end
+
+    class HashingCollectionOwner
+      attr_reader :file, :commit, :annotations
+      include Hashing
+      hasherize :file, :commit
+      hasherize(:annotations).
+        collection(HashingCollectionMember).
+        loading ->(hash) { new hash[:file], hash[:commit], hash[:annotations] }
+
+      def initialize(file, commit, annotations)
+        @file, @commit, @annotations = file, commit, annotations
       end
     end
 
@@ -37,12 +38,7 @@ describe Hashing do
           annotations: [
             { annotation: '--first' },
             { annotation: '--second' },
-          ],
-          __hashing__: {
-            types: {
-              annotations: HashingCollectionMember
-            }
-          }
+          ]
         }
       end
 
@@ -57,12 +53,7 @@ describe Hashing do
           annotations: [
             { annotation: '--first' },
             'xpto',
-          ],
-          __hashing__: {
-            types: {
-              annotations: HashingCollectionMember
-            }
-          }
+          ]
         }
       end
     end
@@ -75,12 +66,7 @@ describe Hashing do
           annotations: [
             {annotation: "first"},
             {annotation: "second"}
-          ],
-          __hashing__: {
-            types: {
-              annotations: HashingCollectionMember
-            }
-          }
+          ]
         }
       end
 

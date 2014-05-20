@@ -29,10 +29,6 @@ module Hashing
     # @return the value that will be stored in the `Hash`
     def to_h(value)
       return value unless @to_h
-
-      if value.respond_to? :map
-        value = hasherize value
-      end
       @to_h.call value
     end
 
@@ -57,39 +53,23 @@ module Hashing
     def to_s
       @name.to_s
     end
+  end
 
-    private
-    # Is an object descendent of {Hashing}?
-    #
-    # @param value [Object]
-    def hashing?(value)
-      value.class.ancestors.include? Hashing
+  class IvarCollection
+    extend Forwardable
+    def_delegators :@holder, :to_sym, :to_s, :name, :to_h=, :from_hash=
+
+    def initialize(collection_holder_ivar, type)
+      @holder = collection_holder_ivar
+      @type = type
     end
 
-    # Hasherize a value when it has {Hashing} in it's method lookup or return
-    # the value. Util when a collection of {Hashing} objects is given and need
-    # to be "hasherized"
-    #
-    # @param value [#map] the value to be verified as a {Hashing} (or not)
-    # @return [#map] collection of hashes
-    def hasherize(collection)
-      collection.map { |item| hashing?(item) ? item.to_h : item }
+    def to_h(value)
+      puts "hello! to_h from collection #{value}"
     end
 
-    # If a collection of {Hashing} objects is given, we have to reconstruct all
-    # collections members before while reconstructing the collection itself.
-    # This method provides that
-    #
-    # TODO: (need?) recursion to reconstruct collections of collections
-    #
-    # @param value [#map] the collection of {Hashing} objects
-    # @param metadata [Hash] containing serialized data about the original object
-    # @return [#map] collection of {Hashing} instances
-    def normalize(collection, metadata)
-      elements_class = metadata.fetch(:types, {}).fetch(@name, nil)
-      return collection unless elements_class.respond_to? :from_hash
-
-      collection.map { |element| elements_class.from_hash element }
+    def from_hash(value)
+      puts "hello! from_hash from collection #{value}"
     end
   end
 end
