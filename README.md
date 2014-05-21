@@ -88,11 +88,8 @@ valid `Hash` like the one created by a `#to_h` call:
 ```ruby
 class File
   include Hashing
-  hasherize :path, :commit, :content
-
-  loading ->(hash) {
-    new hash[:path], hash[:commit], hash[:content]
-  }
+  hasherize(:path, :commit, :content).
+    loading ->(hash) { new hash[:path], hash[:commit], hash[:content] }
 
   # ...
 end
@@ -106,26 +103,6 @@ Note that both `#to_h` and `::from_hash` methods are public, and you can and
 should call them whatever you need in your programs. But the `::from_hash`
 method will be called by `Hashing` when building your instances from hashes (more
 about this: [nested hasherizing](#nested-hasherized-objects)).
-
-#### Hasherize
-
-`Hashing` comes with an alternative way to indicate what fields should be used to
-represent your objects as a `Hash`. This can be done by the `Hasherize` class.
-The previous example can be written like this:
-
-```ruby
-class File
-  include Hasherize.new :path, :commit, :content
-
-  loading ->(hash) {
-    new hash[:path], hash[:commit], hash[:content]
-  }
-
-  # ...
-end
-```
-
-It's just a matter of taste. Use the one that is more appealing to you.
 
 ### Custom "hasherizing" and loading strategies
 
@@ -302,14 +279,6 @@ Can be written as:
 class File
   include Hashing
   hasherize(:path, :commit, :content).attr(true)
-end
-```
-
-Or if you prefer a one liner in this case:
-
-```ruby
-class File
-  include Hasherize.new(:path, :commit, :content).attr(true)
 end
 ```
 
