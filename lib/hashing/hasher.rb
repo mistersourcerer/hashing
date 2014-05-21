@@ -22,12 +22,12 @@ module Hashing
 
     def reader(should_create_attr_reader = true)
       if should_create_attr_reader
-        @current_ivars.each { |ivar| @host_class.send(:attr_reader, ivar.to_sym) }
+        @current_ivars.each { |ivar| @host_class.send :attr_reader, ivar.to_sym }
       end
     end
 
     def collection(type)
-      # replace current ivar for it's collection...
+      # replace current ivar for it's collection version...
       collections = @current_ivars.map { |ivar| IvarCollection.new ivar, type }
       @current_ivars.each { |ivar| @ivars.delete ivar }
       @ivars += collections
