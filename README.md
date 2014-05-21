@@ -278,7 +278,7 @@ Can be written as:
 ```ruby
 class File
   include Hashing
-  hasherize(:path, :commit, :content).attr(true)
+  hasherize(:path, :commit, :content).reader(true)
 end
 ```
 
