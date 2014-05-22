@@ -20,15 +20,16 @@ describe Hashing::Hasher do
   describe "#using" do
     require 'base64'
 
-    let(:hashing_value) { {so_ivar: Base64.encode64("borba")} }
-
     it "stores an object with methods to transform the current ivar" do
-      hasher.add(:so_ivar).reader(true).
-        using(Base64).to(:encode64).from(:decode64)
+      class WowSuchClass
+        hasherize(:so_ivar).reader(true).
+          using(Base64).to(:encode64).from(:decode64).
+          loading ->(hash) { new hash[:so_ivar] }
+      end
+
       wow = WowSuchClass.new "borba"
-      wow.to_h.must_be :==, hashing_value
-      WowSuchClass.from_hash(hashing_value).
-        so_ivar.must_be :==, Base64.decode64('borba')
+      wow.to_h.must_be :==, {so_ivar: Base64.encode64("borba")}
+      WowSuchClass.from_hash({so_ivar: Base64.encode64("borba")}).so_ivar.must_be :==, 'borba'
     end
   end
 end

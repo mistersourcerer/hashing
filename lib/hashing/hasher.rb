@@ -19,6 +19,9 @@ module Hashing
     end
 
     def from(block)
+      if @serializator
+        block = @serializator.method block
+      end
       @current_ivars.each { |ivar| ivar.from_hash = block }
       self
     end
