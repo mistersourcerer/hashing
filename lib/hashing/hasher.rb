@@ -11,6 +11,9 @@ module Hashing
     end
 
     def to(block)
+      if @serializator
+        block = @serializator.method block
+      end
       @current_ivars.each { |ivar| ivar.to_h = block }
       self
     end
@@ -24,6 +27,12 @@ module Hashing
       if should_create_attr_reader
         @current_ivars.each { |ivar| @host_class.send :attr_reader, ivar.to_sym }
       end
+      self
+    end
+
+    def using(serializator)
+      @serializator = serializator
+      self
     end
 
     def collection(type)

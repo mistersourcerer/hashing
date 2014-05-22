@@ -198,9 +198,9 @@ class File
 end
 ```
 
-This will guarantees that the final `Hash` has the `commit` value "downcased"
-when your object is serialized, and "upcased" when the instance is
-reconstructed.
+This will guarantees that the final `Hash` has the `path` and the `commit`
+values "downcased" when your object is serialized, and "upcased" when the
+instance is reconstructed.
 
 #### Nested hasherized objects
 
@@ -248,7 +248,7 @@ class File
   include Hashing
 
   hasherize :path, :commit
-  hasherize(:annotations).collection(Annotation)
+  hasherize(:annotations).collection Annotation
 
   # ...
 end
@@ -278,7 +278,7 @@ Can be written as:
 ```ruby
 class File
   include Hashing
-  hasherize(:path, :commit, :content).reader(true)
+  hasherize(:path, :commit, :content).reader true
 end
 ```
 
