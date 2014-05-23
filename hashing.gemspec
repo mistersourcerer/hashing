@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Hashing::VERSION
   spec.authors       = ["Ricardo Valeriano"]
   spec.email         = ["ricardo.valeriano@gmail.com"]
-  spec.summary       = %q{Serialize your objects as Hashes}
-  spec.description   = %q{Gives you an easy way to specify which instances vars of your objects should be used as `key => value` to serialize it into a hash returned by the `#to_h` method. Also gives you a `YourClass::from_hash` to reconstruct the instances.}
+  spec.summary       = %q{Serialize your objects into Hashes}
+  spec.description   = %q{Provides an easy way to specify which instances vars of your objects should be used as `key` in a Hash returned by the `#to_h` method. Also gives you a `YourClass::from_hash` to reconstruct the instances.}
   spec.homepage      = "http://github.com/ricardovaleriano/hashing"
   spec.license       = "MIT"
 
