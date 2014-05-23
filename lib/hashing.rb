@@ -1,6 +1,15 @@
 require 'hashing/macros'
 
 # Inject the public api into the host class, and it's instances.
+# By "public api" we understand the class methods
+#
+# - {Hashing::Macros#hasherize}
+# - {Hashing::Macros#from_hash}
+# - {Hashing::Macros#__hasher}
+#
+# And the instance method:
+#
+# - {Hashing#to_h}
 #
 # @since 0.0.1
 #
