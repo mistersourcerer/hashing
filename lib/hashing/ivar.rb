@@ -3,6 +3,7 @@ module Hashing
   # to represent an object in a `Hash` form (serialization).
   class Ivar
     attr_reader :name
+    attr_writer :to_h, :from_hash
 
     # Configure the name of an `ivar` and the 'callable' objects thath will be
     # used to prepare the `ivar` value for serialization, and to load the object
@@ -28,10 +29,6 @@ module Hashing
     # @return the value that will be stored in the `Hash`
     def to_h(value)
       return value unless @to_h
-
-      if value.respond_to? :map
-        value = hasherize value
-      end
       @to_h.call value
     end
 
@@ -56,39 +53,25 @@ module Hashing
     def to_s
       @name.to_s
     end
+  end
 
-    private
-    # Is an object descendent of {Hashing}?
-    #
-    # @param value [Object]
-    def hashing?(value)
-      value.class.ancestors.include? Hashing
+  class IvarCollection
+    extend Forwardable
+    def_delegators :@holder, :to_sym, :to_s, :name, :to_h=, :from_hash=
+
+    def initialize(collection_holder_ivar, type)
+      @holder = collection_holder_ivar
+      @type = type
     end
 
-    # Hasherize a value when it has {Hashing} in it's method lookup or return
-    # the value. Util when a collection of {Hashing} objects is given and need
-    # to be "hasherized"
-    #
-    # @param value [#map] the value to be verified as a {Hashing} (or not)
-    # @return [#map] collection of hashes
-    def hasherize(collection)
-      collection.map { |item| hashing?(item) ? item.to_h : item }
+    def to_h(value)
+      @holder.to_h value.map { |item|
+        item.respond_to?(:to_h) ? item.to_h : item
+      }
     end
 
-    # If a collection of {Hashing} objects is given, we have to reconstruct all
-    # collections members before while reconstructing the collection itself.
-    # This method provides that
-    #
-    # TODO: (need?) recursion to reconstruct collections of collections
-    #
-    # @param value [#map] the collection of {Hashing} objects
-    # @param metadata [Hash] containing serialized data about the original object
-    # @return [#map] collection of {Hashing} instances
-    def normalize(collection, metadata)
-      elements_class = metadata.fetch(:types, {}).fetch(@name, nil)
-      return collection unless elements_class.respond_to? :from_hash
-
-      collection.map { |element| elements_class.from_hash element }
+    def from_hash(value)
+      @holder.from_hash value.map { |item| @type.from_hash item }
     end
   end
 end

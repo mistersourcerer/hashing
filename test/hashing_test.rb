@@ -3,14 +3,9 @@ require "base64"
 describe Hashing do
   describe 'interface' do
     let(:hasherized) do
-      # if in doubt about the absense of assertions in this test, please
-      # refer to:
-      # - http://blog.zenspider.com/blog/2012/01/assert_nothing_tested.html
-      # and https://github.com/seattlerb/minitest/issues/159
       Class.new do
         include Hashing
-        hasherize :ivar
-        loading ->() {}
+        hasherize(:ivar)
       end
     end
 
@@ -24,48 +19,61 @@ describe Hashing do
   end# interface
 
   describe 'Recreating a `hasherized` class instance' do
-    let(:hasherized) do
-      Class.new do
-        attr_reader :h
-
-        include Hashing
-        hasherize :h
-
-        def initialize(h)
-          @h = h
-        end
-      end
-    end
-
     describe '.loading' do
+
+      before do
+        @original_stdout, $stdout = $stdout, StringIO.new
+      end
+
+      after do
+        $stdout = @original_stdout
+      end
+
       it 'uses (`#call`) the strategy defined by `.loading`' do
-        called = false
-        my_strategy = ->(h) { called = true }
-        hasherized.send :loading, my_strategy
-        hasherized.from_hash Hash.new
-        called.must_be :==, true
+        Class.new do
+          include Hashing
+          hasherize(:omg).loading ->(hash) { $stdout.write hash }
+        end.from_hash omg: 'lol'
+        $stdout.string.must_be :==, '{:omg=>"lol"}'
       end
     end
 
     describe '#from_hash' do
-      it 'just calls .new if none strategy was defined by .loading' do
-        new_object = hasherized.from_hash h: 'hasherizing'
-        new_object.h.must_be :==, { h: 'hasherizing' }
+      it 'default strategy is just call `.new` passing the hash' do
+        new_object = Class.new do
+          attr_reader :h
+
+          include Hashing
+          hasherize :omg
+
+          def initialize(h)
+            @h = h
+          end
+        end.from_hash omg: 'lol'
+
+        new_object.h.must_be :==, { omg: 'lol' }
       end
 
       it 'give an informative message in case the Hash is malformed' do
-        OmgLolBBQ = hasherized
+        OmgLolBBQ = Class.new do
+          include Hashing
+          hasherize(:h).loading ->(hash) { $stdout.write hash }
+        end
+
         message = nil
-        proc {
+
+        -> {
           begin
             OmgLolBBQ.from_hash xpto: 'JUST NO!'
           rescue => e
             message = e.message
             raise e
           end
-        }.must_raise Hashing::UnconfiguredIvar
-        message.must_be :==, 'The Hash has a :xpto key, but no @xpto '+
-          'was configured in OmgLolBBQ'
+        }.must_raise Hashing::UnconfiguredIvarError
+
+        message.must_be :==, 'The hash passed to OmgLolBBQ.from_hash has the '+
+          'following keys that aren\'t configured by the .hasherize method: '+
+          'xpto.'
       end
     end
   end
@@ -78,10 +86,10 @@ describe Hashing do
         attr_reader :content
 
         hasherize :file, :commit
-        hasherize :content,
-          to_hash: ->(content) { Base64.encode64(content) },
-          from_hash: ->(hash_string) { Base64.decode64(hash_string) }
-        loading ->(hash) { new hash[:file], hash[:commit], hash[:content] }
+        hasherize(:content).
+          to(->(content) { Base64.encode64(content) }).
+          from(->(hash_string) { Base64.decode64(hash_string) }).
+          loading(->(hash) { new hash[:file], hash[:commit], hash[:content] })
 
         def initialize(file, commit, content)
           @file, @commit, @content = file, commit, content
@@ -106,8 +114,8 @@ describe Hashing do
     let(:hasherized) do
       Class.new do
         include Hashing
-        hasherize :file, :commit
-        loading ->(hash) { new hash[:file], hash[:commit] }
+        hasherize(:file, :commit).
+          loading ->(hash) { new hash[:file], hash[:commit] }
 
         def initialize(file, commit)
           @file, @commit = file, commit

@@ -1,4 +1,8 @@
-# v0.0.1 2014-02-05
+# v0.1.0 2014-05-??
+
+## better api naming and conventions
+
+# v0.0.1 2014-05-02
 
 ## first public release :heartpulse:
 
