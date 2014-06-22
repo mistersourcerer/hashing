@@ -8,7 +8,7 @@ method. Also gives you a `YourClass::from_hash` to reconstruct the instances.
 [![Gem Version](https://badge.fury.io/rb/hashing.svg)](http://badge.fury.io/rb/hashing)
 [![Build Status](https://travis-ci.org/ricardovaleriano/hashing.svg?branch=master)](http://travis-ci.org/ricardovaleriano/hashing?branch=master)
 [![Code Climate](https://codeclimate.com/github/ricardovaleriano/hashing.png)](https://codeclimate.com/github/ricardovaleriano/hashing)
-[![Inline docs](http://inch-pages.github.io/github/ricardovaleriano/hashing.svg)](http://inch-pages.github.io/github/ricardovaleriano/hashing)
+[![Inline docs](http://inch-ci.org/github/ricardovaleriano/hashing.svg)](http://inch-ci.org/github/ricardovaleriano/hashing)
 
 ## Installation
 
